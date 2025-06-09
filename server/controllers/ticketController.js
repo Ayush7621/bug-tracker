@@ -27,4 +27,21 @@ const getTicketsByProject = async (req, res) => {
   }
 };
 
-module.exports = { createTicket, getTicketsByProject };
+const updateTicketStatus = async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+    const { status } = req.body;
+
+    const updated = await Ticket.findByIdAndUpdate(ticketId, { status }, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
+module.exports = {
+  createTicket,
+  getTicketsByProject,
+  updateTicketStatus
+};
+

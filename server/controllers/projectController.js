@@ -25,4 +25,21 @@ const getProjects = async (req, res) => {
   }
 };
 
-module.exports = { createProject, getProjects };
+const addTeamMember = async (req, res) => {
+  const { projectId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const updated = await Project.findByIdAndUpdate(
+      projectId,
+      { $addToSet: { teamMembers: userId } }, // avoids duplicates
+      { new: true }
+    ).populate('teamMembers', 'name email');
+
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
+module.exports = { createProject, getProjects, addTeamMember };

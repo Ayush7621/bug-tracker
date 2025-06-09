@@ -1,24 +1,20 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import KanbanBoard from '../components/KanbanBoard';
 
 function Dashboard() {
   const [projects, setProjects] = useState([]);
   const [formData, setFormData] = useState({ title: '', description: '' });
   const [ticketForm, setTicketForm] = useState({});
-  const [ticketsByProject, setTicketsByProject] = useState({});
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
-  // Redirect to login if no token
   useEffect(() => {
-    if (!token) {
-      navigate('/login');
-    }
+    if (!token) navigate('/login');
   }, [token, navigate]);
 
-  // Fetch all projects
   const fetchProjects = async () => {
     try {
       const res = await axios.get('http://localhost:5050/api/projects', {
@@ -34,12 +30,10 @@ function Dashboard() {
     if (token) fetchProjects();
   }, [token]);
 
-  // Handle project form input
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle project form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -54,7 +48,6 @@ function Dashboard() {
     }
   };
 
-  // Handle ticket input change
   const handleTicketChange = (projectId, field, value) => {
     setTicketForm({
       ...ticketForm,
@@ -62,33 +55,40 @@ function Dashboard() {
     });
   };
 
-  // Submit a ticket
   const submitTicket = async (projectId) => {
     const data = ticketForm[projectId];
     try {
-      const res = await axios.post('http://localhost:5050/api/tickets', {
-        ...data,
-        projectId
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      fetchTickets(projectId); // refresh ticket list
+      await axios.post(
+        'http://localhost:5050/api/tickets',
+        { ...data, status: 'To Do', projectId },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
       setTicketForm({ ...ticketForm, [projectId]: {} });
+      setMessage('✅ Ticket created!');
     } catch (err) {
       setMessage(err.response?.data?.msg || '❌ Ticket creation failed');
     }
   };
 
-  // Fetch tickets for a project
-  const fetchTickets = async (projectId) => {
+  const addMember = async (projectId) => {
+    const userId = ticketForm[projectId]?.newMemberId;
+    if (!userId) {
+      setMessage('❌ Please enter a User ID');
+      return;
+    }
     try {
-      const res = await axios.get(`http://localhost:5050/api/tickets/${projectId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTicketsByProject({ ...ticketsByProject, [projectId]: res.data });
+      await axios.put(
+        `http://localhost:5050/api/projects/${projectId}/add-member`,
+        { userId },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      setMessage('✅ Team member added');
     } catch (err) {
-      setMessage(err.response?.data?.msg || '❌ Could not load tickets');
+      setMessage(err.response?.data?.msg || '❌ Could not add member');
     }
   };
 
@@ -150,6 +150,15 @@ function Dashboard() {
                   }
                   className="border p-2 mb-2 mr-2"
                 />
+                <input
+                  type="text"
+                  placeholder="Assignee User ID"
+                  value={ticketForm[proj._id]?.assignee || ''}
+                  onChange={(e) =>
+                    handleTicketChange(proj._id, 'assignee', e.target.value)
+                  }
+                  className="border p-2 mb-2 mr-2"
+                />
                 <button
                   onClick={() => submitTicket(proj._id)}
                   className="bg-green-500 text-white px-4 py-2 rounded"
@@ -158,26 +167,27 @@ function Dashboard() {
                 </button>
               </div>
 
-              {/* Fetch and show tickets */}
-              <button
-                onClick={() => fetchTickets(proj._id)}
-                className="text-sm mt-2 text-blue-600"
-              >
-                Show Tickets
-              </button>
+              {/* Add Team Member Form */}
+              <div className="mt-4">
+                <input
+                  type="text"
+                  placeholder="New Team Member User ID"
+                  value={ticketForm[proj._id]?.newMemberId || ''}
+                  onChange={(e) =>
+                    handleTicketChange(proj._id, 'newMemberId', e.target.value)
+                  }
+                  className="border p-2 mb-2 mr-2"
+                />
+                <button
+                  onClick={() => addMember(proj._id)}
+                  className="bg-indigo-500 text-white px-4 py-2 rounded"
+                >
+                  Add Team Member
+                </button>
+              </div>
 
-              {ticketsByProject[proj._id] && (
-                <ul className="mt-2">
-                  {ticketsByProject[proj._id].map((ticket) => (
-                    <li
-                      key={ticket._id}
-                      className="bg-white border p-2 my-2 rounded"
-                    >
-                      <strong>{ticket.title}</strong> - <em>{ticket.priority}</em> - {ticket.status}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {/* Kanban Board */}
+              <KanbanBoard projectId={proj._id} />
             </li>
           ))}
         </ul>
