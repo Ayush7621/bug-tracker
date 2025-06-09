@@ -2,11 +2,26 @@ import { Link } from 'react-router-dom';
 
 function Home() {
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 text-white">
-      <h1 className="text-4xl font-bold mb-6">Bug Tracker App</h1>
-      <div className="space-x-4">
-        <Link to="/register" className="bg-white text-blue-500 px-4 py-2 rounded font-semibold">Register</Link>
-        <Link to="/login" className="bg-white text-purple-500 px-4 py-2 rounded font-semibold">Login</Link>
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center">
+      <div className="text-center text-white space-y-6 max-w-xl">
+        <h1 className="text-5xl font-bold leading-tight drop-shadow-lg">Bug Tracker Pro</h1>
+        <p className="text-lg text-gray-200">
+          A simple, clean, Project management app. Track bugs, manage tasks, and collaborate with your team.
+        </p>
+        <div className="space-x-4">
+          <Link
+            to="/login"
+            className="inline-block bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition"
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className="inline-block border border-white text-white px-6 py-3 rounded-lg hover:bg-white hover:text-purple-700 transition"
+          >
+            Register
+          </Link>
+        </div>
       </div>
     </div>
   );

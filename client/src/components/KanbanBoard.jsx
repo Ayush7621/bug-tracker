@@ -75,41 +75,59 @@ const KanbanBoard = ({ projectId }) => {
 
   useEffect(() => {
     fetchTickets();
-    // eslint-disable-next-line
   }, [projectId]);
 
   return (
-    <div className="flex gap-4 mt-6">
+    <div className="mt-6 overflow-x-auto">
       <DragDropContext onDragEnd={onDragEnd}>
-        {Object.entries(columns).map(([columnId, tickets]) => (
-          <Droppable droppableId={columnId} key={columnId}>
-            {(provided) => (
-              <div
-                className="bg-gray-100 rounded p-4 w-1/3 min-h-[300px]"
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                <h2 className="text-lg font-bold mb-2">{columnId}</h2>
-                {tickets.map((ticket, index) => (
-                  <Draggable draggableId={ticket._id} index={index} key={ticket._id}>
-                    {(provided) => (
-                      <div
-                        className="bg-white p-3 mb-2 shadow rounded"
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        <strong>{ticket.title}</strong>
-                        <p className="text-sm text-gray-600">{ticket.priority}</p>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        ))}
+        <div className="flex gap-6 min-w-[900px]">
+          {Object.entries(columns).map(([columnId, tickets]) => (
+            <Droppable droppableId={columnId} key={columnId}>
+              {(provided, snapshot) => (
+                <div
+                  className={`bg-gray-100 rounded-lg p-4 w-80 flex-shrink-0 transition ${
+                    snapshot.isDraggingOver ? 'bg-blue-100' : ''
+                  }`}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  <h2 className="text-lg font-bold mb-4 text-gray-700">{columnId}</h2>
+                  <div className="space-y-4 min-h-[100px]">
+                    {tickets.map((ticket, index) => (
+                      <Draggable draggableId={ticket._id} index={index} key={ticket._id}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`bg-white p-3 rounded shadow border-l-4 ${
+                              ticket.priority === 'High'
+                                ? 'border-red-500'
+                                : ticket.priority === 'Medium'
+                                ? 'border-yellow-500'
+                                : 'border-gray-400'
+                            } transition ${
+                              snapshot.isDragging ? 'bg-blue-50 scale-[1.01]' : ''
+                            }`}
+                          >
+                            <div className="font-semibold text-gray-800">
+                              {ticket.title}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1 flex justify-between">
+                              <span>{ticket.priority} Priority</span>
+                              <span className="italic">{ticket.status}</span>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                </div>
+              )}
+            </Droppable>
+          ))}
+        </div>
       </DragDropContext>
     </div>
   );
