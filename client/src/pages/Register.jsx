@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Register() {
   const navigate = useNavigate();
@@ -64,6 +64,13 @@ function Register() {
         {message && (
           <p className="text-sm text-center text-red-600">{message}</p>
         )}
+
+        <p className="text-sm text-center text-gray-500">
+          Already have an account?{' '}
+          <Link to="/login" className="text-purple-600 hover:underline">
+            Login
+          </Link>
+        </p>
       </form>
     </div>
   );
