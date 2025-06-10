@@ -18,7 +18,7 @@ const KanbanBoard = ({ projectId }) => {
 
   const fetchTickets = async () => {
     try {
-      const res = await axios.get(`http://localhost:5050/api/tickets/${projectId}`, {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/tickets/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -40,7 +40,7 @@ const KanbanBoard = ({ projectId }) => {
 
   const updateTicketStatus = async (ticketId, newStatus) => {
     try {
-      await axios.patch(`http://localhost:5050/api/tickets/${ticketId}`, {
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/tickets/${ticketId}`, {
         status: newStatus
       }, {
         headers: { Authorization: `Bearer ${token}` }

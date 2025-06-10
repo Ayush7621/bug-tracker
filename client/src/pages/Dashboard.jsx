@@ -22,7 +22,7 @@ function Dashboard() {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get('http://localhost:5050/api/projects', {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/projects`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProjects(res.data);
@@ -45,7 +45,7 @@ function Dashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5050/api/projects', formData, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/projects`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProjects([...projects, res.data]);
@@ -59,8 +59,7 @@ function Dashboard() {
   const submitTicket = async (projectId) => {
     const data = ticketForm[projectId];
     try {
-      await axios.post(
-        'http://localhost:5050/api/tickets',
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/tickets`,
         { ...data, status: 'To Do', projectId },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -80,8 +79,7 @@ function Dashboard() {
       return;
     }
     try {
-      await axios.put(
-        `http://localhost:5050/api/projects/${projectId}/add-member`,
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/projects/${projectId}/add-member`,
         { userId },
         {
           headers: { Authorization: `Bearer ${token}` }

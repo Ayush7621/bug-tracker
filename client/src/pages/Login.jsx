@@ -14,7 +14,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5050/api/auth/login', formData);
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, formData);
       localStorage.setItem('token', res.data.token);
       setMessage('✅ Login successful');
       setTimeout(() => navigate('/dashboard'), 1000);
